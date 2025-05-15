@@ -1,22 +1,30 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package provabatman2;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.util.Random;
 
 public class provaBatman2 extends JFrame {
-    private final int GRID_SIZE = 10;
-    private final int CELL_SIZE = 50;
-    private final int SHIP_SIZES[] = {5, 4, 3, 3, 2};
-    private final Color COLOR_WATER = new Color(173, 216, 230);
-    private final Color COLOR_SHIP = Color.GRAY;
-    private final Color COLOR_HIT = Color.RED;
-    private final Color COLOR_MISS = Color.WHITE;
+    private  int G = 10;
+    private  int cellSize = 50;
+    private  int navi_sizes[] = {5, 4, 3, 3, 2};
+    private  Color COLOR_WATER = Color.CYAN;
+    private  Color COLOR_SHIP = Color.GRAY;
+    private  Color COLOR_HIT = Color.RED;
+    private  Color COLOR_MISS = Color.WHITE;
     
     private JPanel Pplayer;
     private JPanel Pcomputer;
     private JLabel main;
     
-    private int[][] playerGrid;
-    private int[][] computerGrid;
+    private int[][] Gplayer;
+    private int[][] Gcomputer;
     private int[][] guessCOMgrid;
     
     private boolean turno = true;
@@ -28,32 +36,25 @@ public class provaBatman2 extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
         
-        // Inizializza le griglie
-        playerGrid = new int[GRID_SIZE][GRID_SIZE];
-        computerGrid = new int[GRID_SIZE][GRID_SIZE];
-        guessCOMgrid = new int[GRID_SIZE][GRID_SIZE];
+        Gplayer = new int[G][G];
+        Gcomputer = new int[G][G];
+        guessCOMgrid = new int[G][G];
         
-        // Pannello giocatore
-        Pplayer = new JPanel(new GridLayout(GRID_SIZE, GRID_SIZE));
-        Pplayer.setPreferredSize(new Dimension(GRID_SIZE * CELL_SIZE, GRID_SIZE * CELL_SIZE));
+        Pplayer = new JPanel(new GridLayout(G, G));
+        Pplayer.setPreferredSize(new Dimension(G * cellSize, G * cellSize));
         
-        // Pannello computer
-        Pcomputer = new JPanel(new GridLayout(GRID_SIZE, GRID_SIZE));
-        Pcomputer.setPreferredSize(new Dimension(GRID_SIZE * CELL_SIZE, GRID_SIZE * CELL_SIZE));
+        Pcomputer = new JPanel(new GridLayout(G, G));
+        Pcomputer.setPreferredSize(new Dimension(G * cellSize, G * cellSize));
         
-        // Status label
         main = new JLabel("Posiziona le tue navi. Clicca sulle celle per posizionare.", SwingConstants.CENTER);
         
-        // Aggiungi componenti al frame
         add(Pplayer, BorderLayout.WEST);
         add(Pcomputer, BorderLayout.EAST);
         add(main, BorderLayout.SOUTH);
         
-        // Posiziona le navi del computer
         piazzaNaviCOM();
         
-        // Inizializza le griglie grafiche
-        startGridP();
+        startP();
         startCOMP();
 
 
@@ -65,20 +66,20 @@ public class provaBatman2 extends JFrame {
     private void piazzaNaviCOM() {
         Random rand = new Random();
         
-        for (int shipSize : SHIP_SIZES) {
+        for (int shipSize=0;shipSize<navi_sizes.length;shipSize++) {
             boolean piazzato = false;
             
             while (!piazzato) {
                 boolean h = rand.nextBoolean();
-                int row = rand.nextInt(GRID_SIZE);
-                int col = rand.nextInt(GRID_SIZE);
+                int row = rand.nextInt(G);
+                int col = rand.nextInt(G);
                 
-                if (checkplaceShip(computerGrid, row, col, shipSize, h)) {
+                if (checkplaceShip(Gcomputer, row, col, shipSize, h)) {
                     for (int i = 0; i < shipSize; i++) {
                         if (h) {
-                            computerGrid[row][col + i] = shipSize; // Usiamo shipSize come ID
+                            Gcomputer[row][col + i] = shipSize; 
                         } else {
-                            computerGrid[row + i][col] = shipSize;
+                            Gcomputer[row + i][col] = shipSize;
                         }
                     }
                     piazzato = true;
@@ -89,12 +90,14 @@ public class provaBatman2 extends JFrame {
     
     private boolean checkplaceShip(int[][] grid, int row, int col, int size, boolean h) {
         if (h) {
-            if (col + size > GRID_SIZE) return false;
+            if (col + size > G) 
+                return false;
             for (int i = 0; i < size; i++) {
                 if (grid[row][col + i] != 0) return false;
             }
         } else {
-            if (row + size > GRID_SIZE) return false;
+            if (row + size > G) 
+                return false;
             for (int i = 0; i < size; i++) {
                 if (grid[row + i][col] != 0) return false;
             }
@@ -102,25 +105,27 @@ public class provaBatman2 extends JFrame {
         return true;
     }
     
-    private void startGridP() {
+    private void startP() {
         Pplayer.removeAll();
         
-        for (int row = 0; row < GRID_SIZE; row++) {
-            for (int col = 0; col < GRID_SIZE; col++) {
+        for (int row = 0; row < G; row++) {
+            for (int col = 0; col < G; col++) {
                 JButton button = new JButton();
-                button.setPreferredSize(new Dimension(CELL_SIZE, CELL_SIZE));
+                button.setPreferredSize(new Dimension(cellSize, cellSize));
                 button.setBackground(COLOR_WATER);
                 
-                final int r = row;
-                final int c = col;
+                 int r = row;
+                 int c = col;
                 
-                button.addActionListener(e -> {
-                    if (playerGrid[r][c] == 0) {
-                        playerGrid[r][c] = 1; // 1 rappresenta una nave
-                        button.setBackground(COLOR_SHIP);
-                    } else {
-                        playerGrid[r][c] = 0;
-                        button.setBackground(COLOR_WATER);
+                button.addActionListener(new ActionListener(){
+                    public void ActionPerformed(ActionEvent e){
+                        if(Gplayer[r][c] ==0){
+                             Gplayer[r][c] = 1;
+                            button.setBackground(COLOR_SHIP);
+                        } else{
+                            Gplayer[r][c]=0;
+                            button.setBackground(COLOR_WATER);
+                        }      
                     }
                 });
                 
@@ -130,25 +135,29 @@ public class provaBatman2 extends JFrame {
         
         Pplayer.revalidate();
         Pplayer.repaint();
+        
     }
     
     private void startCOMP() {
         Pcomputer.removeAll();
         
-        for (int row = 0; row < GRID_SIZE; row++) {
-            for (int col = 0; col < GRID_SIZE; col++) {
+        for (int row = 0; row < G; row++) {
+            for (int col = 0; col < G; col++) {
                 JButton button = new JButton();
-                button.setPreferredSize(new Dimension(CELL_SIZE, CELL_SIZE));
+                button.setPreferredSize(new Dimension(cellSize, cellSize));
                 button.setBackground(COLOR_WATER);
                 
-                final int r = row;
-                final int c = col;
+                 int r = row;
+                 int c = col;
                 
-                button.addActionListener(e -> {
-                    if (turno) {
-                        makePlayerMove(r, c, button);
+                button.addActionListener(new ActionListener(){
+                    public void ActionPerformed(ActionEvent e){
+                        if(turno && Gcomputer[r][c]>=0){
+                            muoviPlayer(r,c,button);
+                        
+                        }
                     }
-                });
+                })
                 
                 Pcomputer.add(button);
             }
@@ -158,22 +167,22 @@ public class provaBatman2 extends JFrame {
         Pcomputer.repaint();
     }
     
-    private void makePlayerMove(int row, int col, JButton button) {
-        if (computerGrid[row][col] > 0) { // headshot
+    private void muoviPlayer(int row, int col, JButton button) {
+        if (Gcomputer[row][col] > 0) { // headshot
             button.setBackground(COLOR_HIT);
             button.setText("X");
-            computerGrid[row][col] *= -1; // u suuck
+            Gcomputer[row][col] *= -1; // u suuck
             
             // check se la nave è affondata
-            if (checknaveAffondata(computerGrid, row, col)) {
+            if (checknaveAffondata(Gcomputer, row, col)) {
                 naviKOC++;
-                main.setText("Hai affondato una nave! " + (SHIP_SIZES.length - naviKOC) + " rimaste.");
+                main.setText("Hai affondato una nave! " + (navi_sizes.length - naviKOC) + " rimaste.");
             } else {
                 main.setText("Hai colpito una nave! Tocca ancora a te.");
             }
             
             // ck won
-            if (naviKOC == SHIP_SIZES.length) {
+            if (naviKOC == navi_sizes.length) {
                 JOptionPane.showMessageDialog(this, "Hai vinto! Tutte le navi nemiche sono state affondate.");
                 System.exit(0);
             }
@@ -182,7 +191,7 @@ public class provaBatman2 extends JFrame {
             button.setText("O");
             main.setText("Acqua! Tocca al computer.");
             turno = false;
-            computerMove();
+            muoviCOM();
         }
     }
     
@@ -194,69 +203,65 @@ public class provaBatman2 extends JFrame {
         if (col > 0 && Math.abs(grid[row][col-1]) == shipSize) h = true;
         else if (row > 0 && Math.abs(grid[row-1][col]) == shipSize) 
              h = false;
-        else if (col < GRID_SIZE-1 && Math.abs(grid[row][col+1]) == shipSize) 
+        else if (col < G-1 && Math.abs(grid[row][col+1]) == shipSize) 
              h = true;
-        else if (row < GRID_SIZE-1 && Math.abs(grid[row+1][col]) == shipSize) 
+        else if (row < G-1 && Math.abs(grid[row+1][col]) == shipSize) 
             h = false;
         
         // Controlla se tutte le parti sono colpite
         if (h) {
-            // Trova l'inizio della nave
             int startNaveCol = col;
             while (startNaveCol > 0 && Math.abs(grid[row][startNaveCol-1]) == shipSize) startNaveCol--;
             
-            // Controlla tutte le celle
             for (int c = startNaveCol; c < startNaveCol + shipSize; c++) {
-                if (c >= GRID_SIZE || grid[row][c] > 0) return false;
+                if (c >= G || grid[row][c] > 0) return false;
             }
         } else {
-            // Trova l'inizio della nave
             int iniziaNaveR = row;
             while (iniziaNaveR > 0 && Math.abs(grid[iniziaNaveR-1][col]) == shipSize) iniziaNaveR--;
             
-            // Controlla tutte le celle
             for (int r = iniziaNaveR; r < iniziaNaveR + shipSize; r++) {
-                if (r >= GRID_SIZE || grid[r][col] > 0) return false;
+                if (r >= G || grid[r][col] > 0) return false;
             }
         }
         
         return true;
     }
     
-    private void computerMove() {
+    private void muoviCOM() {
         Random rand = new Random();
         boolean validMove = false;
         
         while (!validMove) {
-            int row = rand.nextInt(GRID_SIZE);
-            int col = rand.nextInt(GRID_SIZE);
+            int row = rand.nextInt(G);
+            int col = rand.nextInt(G);
             
             if (guessCOMgrid[row][col] == 0) {
                 validMove = true;
                 guessCOMgrid[row][col] = 1;
                 
-                if (playerGrid[row][col] > 0) { // Colpito
-                    playerGrid[row][col] *= -1;
-                    JButton button = (JButton) Pplayer.getComponent(row * GRID_SIZE + col);
+                if (Gplayer[row][col] > 0) { // hit
+                    Gplayer[row][col] *= -1;
+                    JButton button = (JButton) Pplayer.getComponent(row * G + col);
                     button.setBackground(COLOR_HIT);
                     button.setText("X");
                     
-                    if (checknaveAffondata(playerGrid, row, col)) {
+                    if (checknaveAffondata(Gplayer, row, col)) {
                         naviKOP++;
-                        main.setText("Il computer ha affondato una tua nave! " + (SHIP_SIZES.length - naviKOP) + " rimaste.");
+                        main.setText("Il computer ha affondato una tua nave! " + (navi_sizes.length - naviKOP) + " rimaste.");
                     } else {
                         main.setText("Il computer ha colpito una tua nave! Tocca ancora a lui.");
                     }
                     
                     // Controlla loser
-                    if (naviKOP == SHIP_SIZES.length) {
+                    if (naviKOP == navi_sizes.length) {
                         JOptionPane.showMessageDialog(this, "Hai perso! Tutte le tue navi sono state affondate.");
                         System.exit(0);
                     }
                     
-                    computerMove(); // extra turn per il computer se colpisce
+                    muoviCOM(); // extra turn per il computer se colpisce
                 } else { // missed!!?
-                    JButton button = (JButton) Pplayer.getComponent(row * GRID_SIZE + col);
+                    JButton button = (JButton) Pplayer.getComponent(row * G + col);
                     button.setBackground(COLOR_MISS);
                     button.setText("O");
                     main.setText("Il computer ha mancato! Tocca a te.");
