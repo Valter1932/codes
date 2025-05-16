@@ -117,15 +117,13 @@ public class provaBatman2 extends JFrame {
                  int r = row;
                  int c = col;
                 
-                button.addActionListener(new ActionListener(){
-                    public void ActionPerformed(ActionEvent e){
-                        if(Gplayer[r][c] ==0){
-                             Gplayer[r][c] = 1;
-                            button.setBackground(COLOR_SHIP);
-                        } else{
-                            Gplayer[r][c]=0;
-                            button.setBackground(COLOR_WATER);
-                        }      
+                button.addActionListener((ActionEvent e) -> {
+                    if(Gplayer[r][c] ==0){
+                        Gplayer[r][c] = 1;
+                        button.setBackground(COLOR_SHIP);
+                    } else{
+                        Gplayer[r][c]=0;
+                        button.setBackground(COLOR_WATER);      
                     }
                 });
                 
@@ -150,14 +148,12 @@ public class provaBatman2 extends JFrame {
                  int r = row;
                  int c = col;
                 
-                button.addActionListener(new ActionListener(){
-                    public void ActionPerformed(ActionEvent e){
-                        if(turno && Gcomputer[r][c]>=0){
-                            muoviPlayer(r,c,button);
+                button.addActionListener((ActionEvent e) -> {
+                    if(turno && Gcomputer[r][c]>=0){
+                        muoviPlayer(r,c,button);
                         
-                        }
                     }
-                })
+                });
                 
                 Pcomputer.add(button);
             }
@@ -168,12 +164,17 @@ public class provaBatman2 extends JFrame {
     }
     
     private void muoviPlayer(int row, int col, JButton button) {
+        if(Gcomputer[row][col]  <0 || button.getText().equals("O") || button.getText().equals("X")){
+            main.setText("cella giÃ  colpita. prova un'altra cella");
+            return;
+        }
+            
         if (Gcomputer[row][col] > 0) { // headshot
             button.setBackground(COLOR_HIT);
             button.setText("X");
             Gcomputer[row][col] *= -1; // u suuck
             
-            // check se la nave è affondata
+            // check se la nave Ã¨ affondata
             if (checknaveAffondata(Gcomputer, row, col)) {
                 naviKOC++;
                 main.setText("Hai affondato una nave! " + (navi_sizes.length - naviKOC) + " rimaste.");
